@@ -1,6 +1,6 @@
 # Horse Parts — HAWS Schallock Center
 
-An interactive learning tool for Horse Chore Crew volunteers to learn horse anatomy terminology. Features an SVG horse diagram with 27 labeled body parts, a learn mode, and two quiz modes.
+An interactive learning tool for Horse Chore Crew volunteers to learn horse anatomy terminology. Features a photo of Blue (a horse at HAWS Schallock Center) with 27 labeled body parts, a learn mode, and two quiz modes.
 
 ## Quick Start
 
@@ -9,7 +9,7 @@ Open `index.html` in any browser. No server, build step, or dependencies require
 ## Features
 
 ### Learn Mode
-- SVG horse silhouette with 27 labeled hotspot dots and leader lines
+- Photo of Blue with 27 labeled hotspot dots and leader lines
 - Click or hover any dot to see the part's name, description, and fun fact in an info panel
 
 ### Quiz Mode
@@ -35,12 +35,14 @@ Score (fraction + percentage), per-question review with checkmarks/X's, encourag
 
 ```
 horsequiz/
-  index.html            SPA shell, all sections, inline SVG horse silhouette
+  index.html            SPA shell, all sections, SVG with photo background
+  images/blue.jpg       Photo of Blue used as the anatomy diagram
   css/style.css         Barn-themed styles, animations, responsive
   js/horse-data.js      27 horse parts: name, description, fun fact, SVG coords
   js/app.js             Hash routing, page toggling, SVG hotspot renderer
   js/learn.js           Learn mode: labeled diagram, click for info panel
   js/quiz.js            Quiz setup, both quiz modes, results page
+  tools/place-parts.html  Coordinate picker for remapping hotspots to a photo
 ```
 
 ## Tech Stack
@@ -51,9 +53,13 @@ Plain HTML, CSS, and JavaScript. No frameworks, no build tools, no external depe
 
 Add `?debug=1` to the URL to show a coordinate grid overlay and enable click-to-log SVG coordinates in the console. Useful for tuning hotspot positions.
 
+## Coordinate Picker Tool
+
+`tools/place-parts.html` is a standalone dev tool for remapping hotspot coordinates when changing the horse photo. Load an image, click to place each of the 27 parts, then export the coordinates as JSON.
+
 ## Design
 
-Warm pastoral theme: cream backgrounds, barn-wood textured header, saddle brown and barn red accents, pasture green highlights, horseshoe decorations. Responsive from 320px to 1200px+. Respects `prefers-reduced-motion`.
+Warm pastoral theme: cream backgrounds, barn-wood textured header, saddle brown and barn red accents, pasture green highlights, horseshoe decorations. Labels use white text outlines for readability against the photo. Responsive from 320px to 1200px+. Respects `prefers-reduced-motion`.
 
 ## Expandability
 
@@ -61,4 +67,4 @@ The `CONTENT_CATEGORIES` object in `horse-data.js` wraps the horse parts data. F
 
 ## Credits
 
-Made for [HAWS Schallock Center](https://www.hawspets.org/) Horse Chore Crew.
+Made for [HAWS Schallock Center](https://www.hawspets.org/) Horse Chore Crew. Photo is of Blue, a horse at the Schallock Center.
