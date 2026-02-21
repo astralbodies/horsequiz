@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horse Parts — HAWS Schallock Center</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="barn-header">
+    <h1>Horse Parts</h1>
+    <p class="subtitle">HAWS Schallock Center &middot; Horse Chore Crew</p>
+  </header>
+
+  <main>
+
+    <!-- ===== LANDING ===== -->
+    <section id="page-landing" class="page active">
+      <div class="card welcome-card">
+        <svg class="horseshoe-icon" viewBox="0 0 100 100" width="64" height="64" aria-hidden="true">
+          <path d="M50 10 C25 10, 10 30, 10 55 C10 70, 18 80, 25 85 L32 72 C28 68, 22 62, 22 55 C22 36, 34 22, 50 22 C66 22, 78 36, 78 55 C78 62, 72 68, 68 72 L75 85 C82 80, 90 70, 90 55 C90 30, 75 10, 50 10Z" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+        </svg>
+        <h2>Welcome, Horse Chore Crew!</h2>
+        <p>Learn the parts of a horse with our interactive diagram. Explore in <strong>Learn Mode</strong> or test your knowledge in <strong>Quiz Mode</strong>.</p>
+        <div class="button-group">
+          <a href="#learn" class="btn btn-primary">Learn Mode</a>
+          <a href="#quiz" class="btn btn-secondary">Quiz Mode</a>
+        </div>
+      </div>
+
+      <!-- horseshoe divider -->
+      <div class="horseshoe-divider" aria-hidden="true">
+        <svg viewBox="0 0 100 100" width="32" height="32">
+          <path d="M50 10 C25 10, 10 30, 10 55 C10 70, 18 80, 25 85 L32 72 C28 68, 22 62, 22 55 C22 36, 34 22, 50 22 C66 22, 78 36, 78 55 C78 62, 72 68, 68 72 L75 85 C82 80, 90 70, 90 55 C90 30, 75 10, 50 10Z" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ===== LEARN MODE ===== -->
+    <section id="page-learn" class="page">
+      <h2 class="section-title">Learn the Parts</h2>
+      <p class="section-desc">Click or hover on any dot to learn about that part of the horse.</p>
+
+      <div class="diagram-container">
+        <svg id="horse-svg-learn" viewBox="0 0 1000 700" class="horse-svg" role="img" aria-label="Horse anatomy diagram">
+          <!-- Horse silhouette -->
+          <g id="horse-body-learn">
+            <!-- Main body -->
+            <path class="horse-silhouette" d="
+              M 720 220
+              C 710 200, 700 170, 680 155
+              C 660 140, 640 138, 625 145
+              C 615 150, 612 160, 610 170
+              C 608 180, 600 188, 590 190
+              C 575 194, 555 188, 540 180
+              C 530 174, 520 168, 508 170
+              C 496 172, 490 180, 488 190
+              L 486 200
+              C 484 210, 478 218, 470 222
+              C 458 228, 442 226, 432 220
+              C 420 212, 412 198, 400 190
+              C 388 182, 370 178, 355 182
+              C 340 186, 328 196, 322 210
+              C 316 224, 318 240, 325 252
+              C 330 260, 335 262, 338 268
+              C 342 278, 340 290, 336 302
+              C 333 310, 332 316, 330 322
+              C 328 332, 320 340, 310 345
+              C 295 352, 280 350, 268 354
+              C 255 358, 245 365, 240 375
+              C 232 392, 230 408, 235 425
+              C 240 438, 248 448, 260 455
+              C 272 462, 290 462, 308 458
+              C 322 454, 335 446, 345 435
+              C 358 420, 362 402, 365 385
+              C 368 370, 375 358, 388 350
+              C 400 342, 415 340, 430 342
+              C 448 344, 465 352, 480 362
+              C 495 372, 508 385, 520 400
+              C 530 412, 538 426, 542 442
+              C 546 458, 544 475, 540 490
+              C 536 505, 528 518, 518 528
+              C 510 536, 500 542, 492 550
+              C 482 560, 478 572, 480 585
+              C 482 598, 490 608, 502 612
+              C 512 616, 524 614, 534 608
+              C 542 602, 548 592, 550 582
+              C 552 570, 556 558, 565 548
+              C 575 536, 590 530, 605 528
+              C 622 526, 640 528, 655 535
+              C 668 540, 678 550, 685 562
+              C 690 572, 692 584, 690 596
+              C 688 606, 682 614, 674 618
+              C 666 622, 656 622, 648 618
+              C 640 614, 636 606, 634 596
+              C 632 584, 636 572, 642 562
+              C 648 552, 656 544, 665 538
+              C 672 534, 680 530, 688 524
+              C 700 514, 710 500, 718 484
+              C 726 468, 730 450, 732 432
+              C 734 412, 733 392, 730 372
+              C 728 358, 725 345, 722 332
+              C 720 318, 720 305, 722 290
+              C 724 275, 728 260, 730 245
+              C 731 235, 726 225, 720 220
+            Z"/>
+            <!-- Mane -->
+            <path class="horse-mane" d="
+              M 400 190
+              C 395 175, 405 160, 415 150
+              C 425 140, 438 135, 450 138
+              C 460 140, 468 148, 472 158
+              C 478 168, 478 180, 472 190
+              C 465 198, 458 200, 460 210
+              C 462 218, 470 222, 470 222
+              M 432 220
+              C 430 205, 440 192, 452 185
+              C 462 180, 475 182, 485 190
+              C 488 192, 486 200, 486 200
+              M 508 170
+              C 505 158, 512 145, 524 138
+              C 535 132, 548 135, 555 142
+              C 560 148, 558 158, 552 165
+              C 546 172, 538 178, 540 180
+              M 540 180
+              C 545 168, 558 160, 572 158
+              C 585 156, 595 162, 598 172
+              C 600 180, 596 188, 590 190
+              M 590 190
+              C 598 178, 610 172, 622 172
+              C 630 172, 636 178, 635 186
+              C 634 192, 628 196, 625 200
+            "/>
+            <!-- Tail -->
+            <path class="horse-tail" d="
+              M 730 245
+              C 740 240, 752 238, 760 245
+              C 770 255, 775 272, 772 290
+              C 768 310, 758 330, 748 350
+              C 738 370, 726 388, 718 408
+              C 712 425, 710 440, 715 455
+              C 718 462, 722 465, 728 460
+              C 732 452, 734 440, 732 432
+            "/>
+            <!-- Ear -->
+            <path class="horse-ear" d="
+              M 338 268
+              C 332 255, 322 238, 310 225
+              C 300 214, 288 210, 282 218
+              C 278 224, 282 235, 290 245
+              C 298 255, 310 262, 322 268
+              C 328 272, 335 272, 338 268
+            Z"/>
+            <!-- Eye -->
+            <ellipse class="horse-eye" cx="360" cy="290" rx="8" ry="10"/>
+          </g>
+          <!-- Hotspot layer rendered by JS -->
+          <g id="hotspots-learn"></g>
+        </svg>
+      </div>
+
+      <div id="info-panel" class="info-panel" hidden>
+        <h3 id="info-name"></h3>
+        <p id="info-desc"></p>
+        <p id="info-fun" class="fun-fact"></p>
+      </div>
+
+      <div class="learn-footer">
+        <a href="#quiz" class="btn btn-secondary">Ready to Quiz? &rarr;</a>
+      </div>
+    </section>
+
+    <!-- ===== QUIZ SETUP ===== -->
+    <section id="page-quiz" class="page">
+      <h2 class="section-title">Quiz Mode</h2>
+      <p class="section-desc">Test your knowledge of horse anatomy!</p>
+
+      <div class="card quiz-setup-card">
+        <fieldset>
+          <legend>Choose a mode</legend>
+          <label class="radio-card">
+            <input type="radio" name="quiz-mode" value="find" checked>
+            <span class="radio-label">
+              <strong>Find the Part</strong>
+              <small>We name it — you click it on the diagram</small>
+            </span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="quiz-mode" value="name">
+            <span class="radio-label">
+              <strong>Name the Part</strong>
+              <small>We highlight it — you pick the name</small>
+            </span>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>How many questions?</legend>
+          <div class="button-group count-group">
+            <label class="radio-pill">
+              <input type="radio" name="quiz-count" value="10" checked>
+              <span>10</span>
+            </label>
+            <label class="radio-pill">
+              <input type="radio" name="quiz-count" value="15">
+              <span>15</span>
+            </label>
+            <label class="radio-pill">
+              <input type="radio" name="quiz-count" value="27">
+              <span>All 27</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <button id="start-quiz" class="btn btn-primary">Start Quiz</button>
+      </div>
+    </section>
+
+    <!-- ===== QUIZ PLAY ===== -->
+    <section id="page-quiz-play" class="page">
+      <div class="quiz-hud">
+        <span id="quiz-progress">Question 1 of 10</span>
+        <span id="quiz-score-live">Score: 0</span>
+      </div>
+      <h3 id="quiz-prompt" class="quiz-prompt"></h3>
+
+      <div class="diagram-container">
+        <svg id="horse-svg-quiz" viewBox="0 0 1000 700" class="horse-svg" role="img" aria-label="Horse anatomy quiz diagram">
+          <g id="horse-body-quiz">
+            <!-- Same horse silhouette (cloned by JS) -->
+          </g>
+          <g id="hotspots-quiz"></g>
+        </svg>
+      </div>
+
+      <div id="quiz-choices" class="quiz-choices" hidden></div>
+
+      <div id="quiz-feedback" class="quiz-feedback" hidden>
+        <p id="feedback-text"></p>
+      </div>
+    </section>
+
+    <!-- ===== RESULTS ===== -->
+    <section id="page-results" class="page">
+      <h2 class="section-title">Results</h2>
+      <div class="card results-card">
+        <div id="results-score" class="results-score"></div>
+        <p id="results-message" class="results-message"></p>
+        <div id="results-detail" class="results-detail"></div>
+        <div class="button-group">
+          <button id="btn-try-again" class="btn btn-primary">Try Again</button>
+          <a href="#learn" class="btn btn-secondary">Back to Learn</a>
+          <a href="#landing" class="btn btn-outline">Home</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>Made with &hearts; for <strong>HAWS Schallock Center</strong> Horse Chore Crew</p>
+  </footer>
+
+  <script src="js/horse-data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/learn.js"></script>
+  <script src="js/quiz.js"></script>
+</body>
+</html>
