@@ -290,10 +290,10 @@ main {
 }
 
 .hotspot-line {
-  stroke: var(--text-mid);
-  stroke-width: 1;
+  stroke: #fff;
+  stroke-width: 1.5;
   stroke-dasharray: 4 3;
-  opacity: 0.6;
+  opacity: 0.85;
   pointer-events: none;
 }
 
@@ -301,6 +301,9 @@ main {
   font-family: var(--font-serif);
   font-size: 13px;
   fill: var(--text-dark);
+  stroke: #fff;
+  stroke-width: 3;
+  paint-order: stroke;
   pointer-events: none;
 }
 
@@ -319,7 +322,7 @@ main {
 .hotspot-group:hover .hotspot-line,
 .hotspot-group.active .hotspot-line {
   opacity: 1;
-  stroke: var(--pasture-green);
+  stroke: #fff;
 }
 
 /* Quiz states */

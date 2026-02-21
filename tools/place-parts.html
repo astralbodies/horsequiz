@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horse Parts — Coordinate Picker</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f0f0f0; color: #333; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+    .header { background: #3E2723; color: #FFF8F0; padding: 0.75rem 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .header h1 { font-size: 1.2rem; }
+    .header .instructions { font-size: 0.8rem; opacity: 0.8; }
+
+    /* ===== LOAD SCREEN ===== */
+    .load-screen { flex: 1; display: flex; align-items: center; justify-content: center; }
+    .load-screen.hidden { display: none; }
+    .drop-zone { border: 3px dashed #aaa; border-radius: 16px; padding: 3rem 4rem; text-align: center; background: #fff; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: #4A7C59; background: #f0f8f0; }
+    .drop-zone h2 { font-size: 1.4rem; color: #555; margin-bottom: 0.5rem; }
+    .drop-zone p { color: #888; margin-bottom: 1rem; font-size: 0.95rem; }
+    .drop-zone .btn-browse { display: inline-block; padding: 0.6rem 1.4rem; background: #4A7C59; color: #fff; border: none; border-radius: 6px; font-size: 0.95rem; cursor: pointer; font-weight: 600; }
+    .drop-zone .btn-browse:hover { background: #3D6B4C; }
+    .drop-zone input[type="file"] { display: none; }
+
+    /* ===== MAIN TOOL ===== */
+    .tool { flex: 1; display: none; flex-direction: column; overflow: hidden; }
+    .tool.active { display: flex; }
+
+    .layout { flex: 1; display: flex; overflow: hidden; }
+
+    /* Sidebar */
+    .sidebar { width: 240px; overflow-y: auto; background: #fff; border-right: 1px solid #ddd; padding: 0.75rem; flex-shrink: 0; }
+    .region-group { margin-bottom: 0.75rem; }
+    .region-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: #999; margin-bottom: 0.3rem; font-weight: 700; padding-left: 0.4rem; }
+    .part-item { display: flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem; border: 1px solid transparent; user-select: none; }
+    .part-item:hover { background: #f5f5f5; }
+    .part-item.current { background: #E3F2FD; border-color: #90CAF9; font-weight: 600; }
+    .part-item .status-icon { width: 14px; text-align: center; font-size: 0.75rem; flex-shrink: 0; }
+    .part-item .status-icon.placed { color: #2E7D32; }
+    .part-item .status-icon.unplaced { color: #ccc; }
+    .part-item .coords { margin-left: auto; font-size: 0.7rem; color: #aaa; font-family: monospace; }
+
+    /* Canvas */
+    .canvas-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 0.75rem; background: #e0e0e0; overflow: hidden; position: relative; }
+    #canvas { display: block; max-width: 100%; max-height: 100%; border-radius: 8px; cursor: crosshair; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+
+    /* SVG hotspot styles */
+    .dot-placed { fill: #C62828; stroke: #fff; stroke-width: 2.5; pointer-events: none; }
+    .dot-current { fill: #1565C0; stroke: #fff; stroke-width: 2.5; pointer-events: none; }
+    .label-bg { fill: rgba(0,0,0,0.72); pointer-events: none; }
+    .label-text { fill: #fff; font-size: 11px; font-family: -apple-system, sans-serif; pointer-events: none; }
+    .pulse { animation: pulse 1.2s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { r: 10; } 50% { r: 16; opacity: 0.7; } }
+
+    /* Footer */
+    .footer { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 1.25rem; background: #fff; border-top: 1px solid #ddd; flex-shrink: 0; }
+    .footer .status { flex: 1; font-size: 0.85rem; color: #666; }
+    .footer button { padding: 0.4rem 1rem; border: none; border-radius: 4px; font-size: 0.85rem; cursor: pointer; font-weight: 600; }
+    .btn-export { background: #2E7D32; color: white; }
+    .btn-export:hover { background: #1B5E20; }
+    .btn-export:disabled { background: #bbb; cursor: default; }
+    .btn-undo { background: #eee; color: #333; }
+    .btn-undo:hover { background: #ddd; }
+    .btn-undo:disabled { background: #f5f5f5; color: #bbb; cursor: default; }
+    .btn-reset { background: #eee; color: #333; }
+    .btn-reset:hover { background: #ddd; }
+
+    /* Modal */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: #fff; border-radius: 10px; padding: 1.5rem; max-width: 720px; width: 92%; max-height: 85vh; display: flex; flex-direction: column; }
+    .modal h2 { margin-bottom: 0.5rem; font-size: 1.2rem; }
+    .modal .hint { color: #666; font-size: 0.85rem; margin-bottom: 0.75rem; }
+    .modal pre { background: #f5f5f5; padding: 1rem; border-radius: 6px; font-size: 0.78rem; overflow: auto; white-space: pre; line-height: 1.5; flex: 1; min-height: 0; }
+    .modal .actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
+    .btn-copy { background: #1565C0; color: white; padding: 0.5rem 1.2rem; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+    .btn-copy:hover { background: #0D47A1; }
+    .btn-close { background: #eee; padding: 0.5rem 1.2rem; border: none; border-radius: 4px; cursor: pointer; }
+    .btn-close:hover { background: #ddd; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>Horse Parts Coordinate Picker</h1>
+    <span class="instructions">Select a part, then click the image to place it</span>
+  </div>
+
+  <!-- Load screen -->
+  <div class="load-screen" id="load-screen">
+    <div class="drop-zone" id="drop-zone">
+      <h2>Load Horse Photo</h2>
+      <p>Drop an image here, or click to browse</p>
+      <button class="btn-browse" id="btn-browse">Choose Image</button>
+      <input type="file" id="file-input" accept="image/*">
+    </div>
+  </div>
+
+  <!-- Main tool (hidden until image loads) -->
+  <div class="tool" id="tool">
+    <div class="layout">
+      <div class="sidebar" id="sidebar"></div>
+      <div class="canvas-area">
+        <svg id="canvas" viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+          <image id="bg-image" x="0" y="0" width="1000" height="700"/>
+          <g id="dots-layer"></g>
+        </svg>
+      </div>
+    </div>
+    <div class="footer">
+      <span class="status" id="status">0 / 27 parts placed</span>
+      <button class="btn-undo" id="btn-undo" disabled>Undo</button>
+      <button class="btn-reset" id="btn-reset">Reset All</button>
+      <button class="btn-export" id="btn-export" disabled>Export Coordinates</button>
+    </div>
+  </div>
+
+  <!-- Export modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <h2>Exported Coordinates</h2>
+      <p class="hint">Copy this JSON and paste it back into the chat — I'll use it to update <code>horse-data.js</code>.</p>
+      <pre id="export-output"></pre>
+      <div class="actions">
+        <button class="btn-copy" id="btn-copy">Copy to Clipboard</button>
+        <button class="btn-close" id="btn-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    "use strict";
+
+    // ===== PART DEFINITIONS =====
+    var PARTS = [
+      { id: "poll", name: "Poll", region: "head" },
+      { id: "forelock", name: "Forelock", region: "head" },
+      { id: "ear", name: "Ear", region: "head" },
+      { id: "muzzle", name: "Muzzle", region: "head" },
+      { id: "nostril", name: "Nostril", region: "head" },
+      { id: "throatlatch", name: "Throatlatch", region: "head" },
+      { id: "crest", name: "Crest", region: "neck" },
+      { id: "mane", name: "Mane", region: "neck" },
+      { id: "withers", name: "Withers", region: "neck" },
+      { id: "back", name: "Back", region: "neck" },
+      { id: "loin", name: "Loin", region: "neck" },
+      { id: "croup", name: "Croup", region: "neck" },
+      { id: "dock", name: "Dock", region: "neck" },
+      { id: "tail", name: "Tail", region: "neck" },
+      { id: "shoulder", name: "Shoulder", region: "body" },
+      { id: "chest", name: "Chest", region: "body" },
+      { id: "barrel", name: "Barrel", region: "body" },
+      { id: "flank", name: "Flank", region: "body" },
+      { id: "forearm", name: "Forearm", region: "front_leg" },
+      { id: "knee", name: "Knee", region: "front_leg" },
+      { id: "cannon", name: "Cannon", region: "front_leg" },
+      { id: "fetlock", name: "Fetlock", region: "front_leg" },
+      { id: "pastern", name: "Pastern", region: "front_leg" },
+      { id: "hoof", name: "Hoof", region: "front_leg" },
+      { id: "stifle", name: "Stifle", region: "hind_leg" },
+      { id: "gaskin", name: "Gaskin", region: "hind_leg" },
+      { id: "hock", name: "Hock", region: "hind_leg" }
+    ];
+
+    var REGIONS = [
+      { id: "head", label: "Head" },
+      { id: "neck", label: "Neck / Topline" },
+      { id: "body", label: "Body" },
+      { id: "front_leg", label: "Front Leg" },
+      { id: "hind_leg", label: "Hind Leg" }
+    ];
+
+    // ===== STATE =====
+    var placements = {};   // id -> { x, y }
+    var currentId = null;
+    var history = [];      // { id, prev: {x,y}|null }
+    var viewBoxH = 700;
+
+    // ===== DOM =====
+    var loadScreen = document.getElementById("load-screen");
+    var dropZone = document.getElementById("drop-zone");
+    var fileInput = document.getElementById("file-input");
+    var tool = document.getElementById("tool");
+    var sidebar = document.getElementById("sidebar");
+    var svg = document.getElementById("canvas");
+    var bgImage = document.getElementById("bg-image");
+    var dotsLayer = document.getElementById("dots-layer");
+    var statusEl = document.getElementById("status");
+    var btnUndo = document.getElementById("btn-undo");
+    var btnReset = document.getElementById("btn-reset");
+    var btnExport = document.getElementById("btn-export");
+    var modal = document.getElementById("modal");
+    var exportOutput = document.getElementById("export-output");
+
+    // ===== IMAGE LOADING =====
+
+    // Try auto-load first
+    var autoImg = new Image();
+    autoImg.onload = function () { activateTool("../images/blue.jpg", autoImg); };
+    autoImg.onerror = function () { /* show file chooser — it's already visible */ };
+    autoImg.src = "../images/blue.jpg";
+
+    // File chooser
+    document.getElementById("btn-browse").addEventListener("click", function () {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener("change", function () {
+      if (fileInput.files && fileInput.files[0]) {
+        loadFile(fileInput.files[0]);
+      }
+    });
+
+    // Drag and drop
+    dropZone.addEventListener("dragover", function (e) {
+      e.preventDefault();
+      dropZone.classList.add("dragover");
+    });
+    dropZone.addEventListener("dragleave", function () {
+      dropZone.classList.remove("dragover");
+    });
+    dropZone.addEventListener("drop", function (e) {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        loadFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    function loadFile(file) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () { activateTool(url, img); };
+      img.onerror = function () { alert("Could not load image."); };
+      img.src = url;
+    }
+
+    function activateTool(src, img) {
+      // Compute viewBox to match image aspect ratio
+      viewBoxH = Math.round(1000 * img.naturalHeight / img.naturalWidth);
+      svg.setAttribute("viewBox", "0 0 1000 " + viewBoxH);
+      bgImage.setAttribute("href", src);
+      bgImage.setAttribute("width", "1000");
+      bgImage.setAttribute("height", viewBoxH);
+
+      loadScreen.classList.add("hidden");
+      tool.classList.add("active");
+
+      buildSidebar();
+      selectFirstUnplaced();
+      updateAll();
+    }
+
+    // ===== SIDEBAR =====
+    function buildSidebar() {
+      sidebar.innerHTML = "";
+      REGIONS.forEach(function (region) {
+        var group = document.createElement("div");
+        group.className = "region-group";
+
+        var title = document.createElement("div");
+        title.className = "region-title";
+        title.textContent = region.label;
+        group.appendChild(title);
+
+        PARTS.filter(function (p) { return p.region === region.id; })
+          .forEach(function (part) {
+            var item = document.createElement("div");
+            item.className = "part-item";
+            item.setAttribute("data-id", part.id);
+
+            var icon = document.createElement("span");
+            icon.className = "status-icon unplaced";
+            icon.textContent = "\u25CB";
+
+            var name = document.createElement("span");
+            name.textContent = part.name;
+
+            var coords = document.createElement("span");
+            coords.className = "coords";
+
+            item.appendChild(icon);
+            item.appendChild(name);
+            item.appendChild(coords);
+
+            item.addEventListener("click", function () {
+              currentId = part.id;
+              updateAll();
+            });
+
+            group.appendChild(item);
+          });
+
+        sidebar.appendChild(group);
+      });
+    }
+
+    // ===== SELECTION =====
+    function selectFirstUnplaced() {
+      for (var i = 0; i < PARTS.length; i++) {
+        if (!placements[PARTS[i].id]) {
+          currentId = PARTS[i].id;
+          return;
+        }
+      }
+      currentId = null;
+    }
+
+    // ===== SVG CLICK =====
+    svg.addEventListener("click", function (e) {
+      if (!currentId) return;
+
+      var pt = svg.createSVGPoint();
+      pt.x = e.clientX;
+      pt.y = e.clientY;
+      var svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+
+      var x = Math.round(svgP.x);
+      var y = Math.round(svgP.y);
+
+      history.push({ id: currentId, prev: placements[currentId] || null });
+      placements[currentId] = { x: x, y: y };
+
+      selectFirstUnplaced();
+      updateAll();
+    });
+
+    // ===== RENDER DOTS =====
+    function renderDots() {
+      dotsLayer.innerHTML = "";
+      var ns = "http://www.w3.org/2000/svg";
+
+      PARTS.forEach(function (part) {
+        var p = placements[part.id];
+        if (!p) return;
+
+        var g = document.createElementNS(ns, "g");
+        var isCurrent = part.id === currentId;
+
+        // Dot
+        var circle = document.createElementNS(ns, "circle");
+        circle.setAttribute("cx", p.x);
+        circle.setAttribute("cy", p.y);
+        circle.setAttribute("r", isCurrent ? "12" : "9");
+        circle.setAttribute("class", isCurrent ? "dot-current pulse" : "dot-placed");
+        g.appendChild(circle);
+
+        // Label
+        var textLen = part.name.length * 6.5 + 10;
+        var lx = p.x - textLen / 2;
+        var ly = p.y - 20;
+
+        var rect = document.createElementNS(ns, "rect");
+        rect.setAttribute("x", lx);
+        rect.setAttribute("y", ly - 11);
+        rect.setAttribute("width", textLen);
+        rect.setAttribute("height", 16);
+        rect.setAttribute("rx", "3");
+        rect.setAttribute("class", "label-bg");
+        g.appendChild(rect);
+
+        var text = document.createElementNS(ns, "text");
+        text.setAttribute("x", p.x);
+        text.setAttribute("y", ly + 2);
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("class", "label-text");
+        text.textContent = part.name;
+        g.appendChild(text);
+
+        dotsLayer.appendChild(g);
+      });
+    }
+
+    // ===== UPDATE ALL =====
+    function updateAll() {
+      var count = Object.keys(placements).length;
+
+      // Status
+      statusEl.textContent = count + " / 27 parts placed";
+      btnExport.disabled = count === 0;
+      btnUndo.disabled = history.length === 0;
+
+      // Sidebar
+      var items = sidebar.querySelectorAll(".part-item");
+      items.forEach(function (item) {
+        var id = item.getAttribute("data-id");
+        var isPlaced = !!placements[id];
+        item.classList.toggle("current", id === currentId);
+
+        var icon = item.querySelector(".status-icon");
+        icon.textContent = isPlaced ? "\u2713" : "\u25CB";
+        icon.className = "status-icon " + (isPlaced ? "placed" : "unplaced");
+
+        var coords = item.querySelector(".coords");
+        coords.textContent = isPlaced ? placements[id].x + "," + placements[id].y : "";
+      });
+
+      // Dots
+      renderDots();
+
+      // Scroll current sidebar item into view
+      var cur = sidebar.querySelector('.part-item.current');
+      if (cur) cur.scrollIntoView({ block: "nearest" });
+    }
+
+    // ===== UNDO =====
+    btnUndo.addEventListener("click", function () {
+      if (history.length === 0) return;
+      var last = history.pop();
+      if (last.prev) {
+        placements[last.id] = last.prev;
+      } else {
+        delete placements[last.id];
+      }
+      currentId = last.id;
+      updateAll();
+    });
+
+    // ===== RESET =====
+    btnReset.addEventListener("click", function () {
+      if (Object.keys(placements).length === 0) return;
+      if (!confirm("Reset all placements?")) return;
+      placements = {};
+      history = [];
+      selectFirstUnplaced();
+      updateAll();
+    });
+
+    // ===== EXPORT =====
+    btnExport.addEventListener("click", function () {
+      var data = {
+        viewBox: { width: 1000, height: viewBoxH },
+        coordinates: {}
+      };
+
+      PARTS.forEach(function (part) {
+        var p = placements[part.id];
+        if (p) {
+          data.coordinates[part.id] = { x: p.x, y: p.y };
+        }
+      });
+
+      exportOutput.textContent = JSON.stringify(data, null, 2);
+      modal.classList.add("active");
+    });
+
+    // ===== MODAL =====
+    document.getElementById("btn-close").addEventListener("click", function () {
+      modal.classList.remove("active");
+    });
+
+    document.getElementById("btn-copy").addEventListener("click", function () {
+      var text = exportOutput.textContent;
+      navigator.clipboard.writeText(text).then(function () {
+        var btn = document.getElementById("btn-copy");
+        btn.textContent = "Copied!";
+        setTimeout(function () { btn.textContent = "Copy to Clipboard"; }, 2000);
+      });
+    });
+
+    // Close modal on overlay click
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) modal.classList.remove("active");
+    });
+
+    // ===== KEYBOARD =====
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "z" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        btnUndo.click();
+      }
+    });
+
+  })();
+  </script>
+</body>
+</html>

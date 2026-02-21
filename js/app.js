@@ -190,7 +190,7 @@
       }
 
       // Horizontal lines every 100px
-      for (var y = 0; y <= 700; y += 100) {
+      for (var y = 0; y <= 665; y += 100) {
         var hline = document.createElementNS(ns, "line");
         hline.setAttribute("x1", 0);
         hline.setAttribute("y1", y);
@@ -200,8 +200,8 @@
         debugG.appendChild(hline);
 
         var htxt = document.createElementNS(ns, "text");
-        htxt.setAttribute("x", 2);
-        htxt.setAttribute("y", y + 12);
+        htxt.setAttribute("x", 4);
+        htxt.setAttribute("y", y + 14);
         htxt.classList.add("debug-text");
         htxt.textContent = y;
         debugG.appendChild(htxt);
